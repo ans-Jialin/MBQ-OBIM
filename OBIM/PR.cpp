@@ -1,0 +1,96 @@
+#include "OBIM.h"
+#define INF 0x3f3f3f3f
+inline int read()
+{
+    int x=0,f=1;
+    char ch=getchar();
+    while(ch!='-' && (ch<'0'||ch>'9'))ch=getchar();
+    if(ch=='-')f=-1,ch=getchar();
+    while(ch>='0'&&ch<='9')
+    {
+        x=x*10+ch-'0';
+        ch=getchar();
+    }
+    return x*f;
+}
+#define N 100010
+vector<int>in[N];
+int deg[N],n;
+vector<double>r,ans;
+double dangling;
+const double DAMP=0.85;
+void solve(OBIM &a,fun x,int tid)
+{
+    int v=x.x;
+    double s=dangling/n;
+    for(int u:in[v])s+=r[u]/deg[u];
+    ans[v]=(1-DAMP)/n+DAMP*s;
+}
+int main()
+{
+    read();read();read();read();
+    n=read();int m=read();
+    for(int i=1;i<=m;i++)
+    {
+        int u=read(),v=read(),w=read();
+        in[v].push_back(u);
+        deg[u]++;
+    }
+    int iters=read();
+    r.assign(n+1,1.0/n);
+    ans.assign(n+1,0);
+    auto start=chrono::steady_clock::now();
+    for(int it=0;it<iters;it++)
+    {
+        dangling=0;
+        for(int i=1;i<=n;i++)if(deg[i]==0)dangling+=r[i];
+        OBIM a;
+        for(int i=1;i<=n;i++)a.push({i,0},0);
+    
+        vector<thread>workers;
+    
+                    for(int i=0;i<TNUM;i++)
+    
+                    {
+    
+                        workers.emplace_back([&,i]()
+    
+                        {
+    
+                            while(1)
+    
+                            {
+    
+                                fun x;
+    
+                                if(a.pop(x,i))
+    
+                                {
+    
+                                    solve(a,x,i);
+    
+                                    a.complete();
+    
+                                }
+    
+                                else if(a.finished())break;
+    
+                                else this_thread::yield();
+    
+                            }
+    
+                        });
+    
+                    }
+    
+                    for(auto &th:workers)th.join();
+        r.swap(ans);
+    }
+    auto end=chrono::steady_clock::now();
+    double sum=0;
+    for(int i=1;i<=n;i++)sum+=r[i];
+    cout<<fixed<<setprecision(9)<<"rank_sum = "<<sum<<endl;
+    for(int i=1;i<=min(n,10);i++)cout<<i<<" "<<r[i]<<endl;
+    cout<<"time = "<<chrono::duration<double,milli>(end-start).count()<<" ms"<<endl;
+    return 0;
+}
