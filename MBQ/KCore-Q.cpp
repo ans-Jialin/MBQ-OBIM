@@ -56,21 +56,21 @@ int main()
         {
             a.threadpush();
             vector<thread>workers;
-                        for(int i=0;i<TNUM;i++)
-                        {
-                            workers.emplace_back([&]()
-                            {
-                                a.initTID();
-                                while(1)
-                                {
-                                    bucket res=a.pop();
-                                    if(res.empty())break;
-                                    fun x=res.take();
-                                    solve(a,x);
-                                }
-                            });
-                        }
-                        for(auto &th:workers)th.join();
+            for(int i=0;i<TNUM;i++)
+            {
+                workers.emplace_back([&]()
+                {
+                    a.initTID();
+                    while(1)
+                    {
+                        bucket res=a.pop();
+                        if(res.empty())break;
+                        fun x=res.take();
+                        solve(a,x);
+                    }
+                });
+            }
+            for(auto &th:workers)th.join();
         }
         left=0;
         for(int i=1;i<=n;i++)left+=!removed[i].load();

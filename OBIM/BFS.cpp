@@ -1,25 +1,12 @@
 #include "OBIM.h"
 #define INF 0x3f3f3f3f
-inline int read()
-{
-    int x=0,f=1;
-    char ch=getchar();
-    while(ch!='-' && (ch<'0'||ch>'9'))ch=getchar();
-    if(ch=='-')f=-1,ch=getchar();
-    while(ch>='0'&&ch<='9')
-    {
-        x=x*10+ch-'0';
-        ch=getchar();
-    }
-    return x*f;
-}
 #define N 100010
 vector<pair<int,int>>G[N];
 atomic<int>dis[N];
 void solve(OBIM &a,fun x,int tid)
 {
     int u=x.x,d=dis[u].load();
-    if(d>=INF || x.p!=d)return;
+    if(d>=INF||x.p!=d)return;
     for(auto e:G[u])
     {
         int v=e.first,w=e.second;
@@ -50,7 +37,6 @@ int main()
     int s=read(),t=read();
     dis[s].store(0);
     a.push({s,0},0);
-
     auto start=chrono::steady_clock::now();
     vector<thread>workers;
     for(int i=0;i<TNUM;i++)

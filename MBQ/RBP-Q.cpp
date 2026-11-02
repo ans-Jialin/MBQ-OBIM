@@ -45,25 +45,24 @@ int main()
     for(int it=0;it<iters;it++)
     {
         MBQ a;
-        for(int i=0;i<(int)E.size();i++)
-            a.push({i,-min(1000000,(int)(res[i]*1000000))});
+        for(int i=0;i<(int)E.size();i++)a.push({i,-min(1000000,(int)(res[i]*1000000))});
         a.threadpush();
         vector<thread>workers;
-                    for(int i=0;i<TNUM;i++)
-                    {
-                        workers.emplace_back([&]()
-                        {
-                            a.initTID();
-                            while(1)
-                            {
-                                bucket res=a.pop();
-                                if(res.empty())break;
-                                fun x=res.take();
-                                solve(a,x);
-                            }
-                        });
-                    }
-                    for(auto &th:workers)th.join();
+        for(int i=0;i<TNUM;i++)
+        {
+            workers.emplace_back([&]()
+            {
+                a.initTID();
+                while(1)
+                {
+                    bucket res=a.pop();
+                    if(res.empty())break;
+                    fun x=res.take();
+                    solve(a,x);
+                }
+            });
+        }
+        for(auto &th:workers)th.join();
         for(int i=0;i<(int)E.size();i++)res[i]=abs(ans[i]-msg[i]);
         msg.swap(ans);
     }

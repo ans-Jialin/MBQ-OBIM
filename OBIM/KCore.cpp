@@ -1,18 +1,5 @@
 #include "OBIM.h"
 #define INF 0x3f3f3f3f
-inline int read()
-{
-    int x=0,f=1;
-    char ch=getchar();
-    while(ch!='-' && (ch<'0'||ch>'9'))ch=getchar();
-    if(ch=='-')f=-1,ch=getchar();
-    while(ch>='0'&&ch<='9')
-    {
-        x=x*10+ch-'0';
-        ch=getchar();
-    }
-    return x*f;
-}
 #define N 100010
 vector<int>G[N];
 atomic<int>deg[N],removed[N];
@@ -27,8 +14,7 @@ void solve(OBIM &a,fun x,int tid)
         if(d==kk)
         {
             int old=0;
-            if(removed[v].compare_exchange_strong(old,1))
-                a.push({v,kk},tid);
+            if(removed[v].compare_exchange_strong(old,1))a.push({v,kk},tid);
         }
     }
 }
@@ -65,44 +51,25 @@ int main()
         }
         if(cnt)
         {
-        
             vector<thread>workers;
-        
-                        for(int i=0;i<TNUM;i++)
-        
-                        {
-        
-                            workers.emplace_back([&,i]()
-        
-                            {
-        
-                                while(1)
-        
-                                {
-        
-                                    fun x;
-        
-                                    if(a.pop(x,i))
-        
-                                    {
-        
-                                        solve(a,x,i);
-        
-                                        a.complete();
-        
-                                    }
-        
-                                    else if(a.finished())break;
-        
-                                    else this_thread::yield();
-        
-                                }
-        
-                            });
-        
-                        }
-        
-                        for(auto &th:workers)th.join();
+            for(int i=0;i<TNUM;i++)
+            {
+                workers.emplace_back([&,i]()       
+                {        
+                    while(1)        
+                    {       
+                        fun x;       
+                        if(a.pop(x,i))     
+                        {    
+                            solve(a,x,i);    
+                            a.complete();    
+                        }       
+                        else if(a.finished())break;        
+                        else this_thread::yield();
+                    } 
+                });      
+            }    
+            for(auto &th:workers)th.join();
         }
         left=0;
         for(int i=1;i<=n;i++)left+=!removed[i].load();

@@ -23,6 +23,22 @@ struct fun
 {
     int x,p;
 };
+inline int read()
+{
+    int wjl=0,jia=1;
+    char ch=getchar();
+    while(ch<'0'||ch>'9')
+    {
+        if(ch=='-')jia*=-1;
+        ch=getchar();
+    }
+    while(ch>='0'&&ch<='9')
+    {
+        wjl=(wjl<<1)+(wjl<<3)+(ch^48);
+        ch=getchar();
+    }
+    return wjl*jia;
+}
 struct Queue
 {
     private:

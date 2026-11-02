@@ -1,18 +1,5 @@
 #include "OBIM.h"
 #define INF 0x3f3f3f3f
-inline int read()
-{
-    int x=0,f=1;
-    char ch=getchar();
-    while(ch!='-' && (ch<'0'||ch>'9'))ch=getchar();
-    if(ch=='-')f=-1,ch=getchar();
-    while(ch>='0'&&ch<='9')
-    {
-        x=x*10+ch-'0';
-        ch=getchar();
-    }
-    return x*f;
-}
 #define K 4
 struct Rating
 {
@@ -39,8 +26,7 @@ void solve(OBIM &a,fun x,int tid)
             double err=E[id].w-p;
             for(int j=0;j<K;j++)grad[j]+=err*V[v][j];
         }
-        for(int j=0;j<K;j++)
-            U[u][j]+=LR*(grad[j]/gu[u].size()-REG*U[u][j]);
+        for(int j=0;j<K;j++)U[u][j]+=LR*(grad[j]/gu[u].size()-REG*U[u][j]);
     }
     else
     {
@@ -53,8 +39,7 @@ void solve(OBIM &a,fun x,int tid)
             double err=E[id].w-p;
             for(int j=0;j<K;j++)grad[j]+=err*U[v][j];
         }
-        for(int j=0;j<K;j++)
-            V[u][j]+=LR*(grad[j]/gv[u].size()-REG*V[u][j]);
+        for(int j=0;j<K;j++)V[u][j]+=LR*(grad[j]/gv[u].size()-REG*V[u][j]);
     }
 }
 int main()
@@ -82,46 +67,26 @@ int main()
         {
             OBIM a;
             int lim=phase?m:n;
-            for(int i=1;i<=lim;i++)
-                a.push({i,-(int)(phase?gv[i].size():gu[i].size())},0);
-        
+            for(int i=1;i<=lim;i++)a.push({i,-(int)(phase?gv[i].size():gu[i].size())},0);
             vector<thread>workers;
-        
-                        for(int i=0;i<TNUM;i++)
-        
+            for(int i=0;i<TNUM;i++)
+            {
+                workers.emplace_back([&,i]()
+                {
+                    while(1)
+                    {
+                        fun x;
+                        if(a.pop(x,i))
                         {
-        
-                            workers.emplace_back([&,i]()
-        
-                            {
-        
-                                while(1)
-        
-                                {
-        
-                                    fun x;
-        
-                                    if(a.pop(x,i))
-        
-                                    {
-        
-                                        solve(a,x,i);
-        
-                                        a.complete();
-        
-                                    }
-        
-                                    else if(a.finished())break;
-        
-                                    else this_thread::yield();
-        
-                                }
-        
-                            });
-        
+                            solve(a,x,i);
+                            a.complete();
                         }
-        
-                        for(auto &th:workers)th.join();
+                        else if(a.finished())break;
+                        else this_thread::yield();
+                    }
+                });
+            }
+            for(auto &th:workers)th.join();
         }
     auto end=chrono::steady_clock::now();
     double err=0;

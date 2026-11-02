@@ -37,21 +37,21 @@ int main()
         for(int i=0;i<n;i++)a.push({i,0});
         a.threadpush();
         vector<thread>workers;
-                    for(int i=0;i<TNUM;i++)
-                    {
-                        workers.emplace_back([&]()
-                        {
-                            a.initTID();
-                            while(1)
-                            {
-                                bucket res=a.pop();
-                                if(res.empty())break;
-                                fun x=res.take();
-                                solve(a,x);
-                            }
-                        });
-                    }
-                    for(auto &th:workers)th.join();
+        for(int i=0;i<TNUM;i++)
+        {
+            workers.emplace_back([&]()
+            {
+                a.initTID();
+                while(1)
+                {
+                    bucket res=a.pop();
+                    if(res.empty())break;
+                    fun x=res.take();
+                    solve(a,x);
+                }
+            });
+        }
+        for(auto &th:workers)th.join();
         for(int j=0;j<k;j++)
         {
             cnt[j]=0;
@@ -63,8 +63,10 @@ int main()
             cnt[j]++;
             for(int t=0;t<d;t++)sum[j][t]+=x[i][t];
         }
-        for(int j=0;j<k;j++)if(cnt[j])
-            for(int t=0;t<d;t++)c[j][t]=sum[j][t]/cnt[j];
+        for(int j=0;j<k;j++)
+        {
+            if(cnt[j])for(int t=0;t<d;t++)c[j][t]=sum[j][t]/cnt[j];
+        }
     }
     auto end=chrono::steady_clock::now();
     double sse=0;

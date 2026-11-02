@@ -1,18 +1,5 @@
 #include "OBIM.h"
 #define INF 0x3f3f3f3f
-inline int read()
-{
-    int x=0,f=1;
-    char ch=getchar();
-    while(ch!='-' && (ch<'0'||ch>'9'))ch=getchar();
-    if(ch=='-')f=-1,ch=getchar();
-    while(ch>='0'&&ch<='9')
-    {
-        x=x*10+ch-'0';
-        ch=getchar();
-    }
-    return x*f;
-}
 #define N 100010
 struct Edge
 {
@@ -56,46 +43,26 @@ int main()
     for(int it=0;it<iters;it++)
     {
         OBIM a;
-        for(int i=0;i<(int)E.size();i++)
-            a.push({i,-min(1000000,(int)(res[i]*1000000))},0);
-    
+        for(int i=0;i<(int)E.size();i++)a.push({i,-min(1000000,(int)(res[i]*1000000))},0);
         vector<thread>workers;
-    
-                    for(int i=0;i<TNUM;i++)
-    
+        for(int i=0;i<TNUM;i++)
+        {
+            workers.emplace_back([&,i]()
+            {
+                while(1)
+                {
+                    fun x;
+                    if(a.pop(x,i))
                     {
-    
-                        workers.emplace_back([&,i]()
-    
-                        {
-    
-                            while(1)
-    
-                            {
-    
-                                fun x;
-    
-                                if(a.pop(x,i))
-    
-                                {
-    
-                                    solve(a,x,i);
-    
-                                    a.complete();
-    
-                                }
-    
-                                else if(a.finished())break;
-    
-                                else this_thread::yield();
-    
-                            }
-    
-                        });
-    
+                        solve(a,x,i);
+                        a.complete();
                     }
-    
-                    for(auto &th:workers)th.join();
+                    else if(a.finished())break;
+                    else this_thread::yield();
+                }
+            });
+        }
+        for(auto &th:workers)th.join();
         for(int i=0;i<(int)E.size();i++)res[i]=abs(ans[i]-msg[i]);
         msg.swap(ans);
     }
