@@ -7,6 +7,7 @@
 #include<ctime>
 #include<atomic>
 #include<vector>
+#include<cstring>
 #include<map>
 #include<iomanip> 
 #include<chrono>
