@@ -15,10 +15,11 @@
 #include<mutex>
 #include<atomic>
 #include<random>
+#include "MBQ_affinity.h"
 using namespace std;
 #define INF 0x3f3f3f3f
 const int QNUM=80;
-const int TNUM=6;
+const int TNUM=MBQ_THREADS;
 const int STICKY=4;
 int GAP,RANGE,SIZE,BATCH;
 inline int read()
@@ -269,6 +270,7 @@ struct MBQ
     void initTID()
     {
         tID=ID.fetch_add(1);
+        bindCPU(tID);
         pQueue=tID;
         pCnt=1;
     }
