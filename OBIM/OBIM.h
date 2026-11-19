@@ -17,9 +17,10 @@
 #include<deque>
 #include<mutex>
 #include<climits>
+#include "OBIM_affinity.h"
 using namespace std;
 const int QNUM=10;
-const int TNUM=4;
+const int TNUM=OBIM_THREADS;
 struct fun
 {
     int x,p;

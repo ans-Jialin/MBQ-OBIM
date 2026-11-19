@@ -1,5 +1,5 @@
 #include "MBQ.h"
-#define N 100010
+#define N 5100010
 vector<pair<int,int>>G[N];
 atomic<int>dis[N];
 void solve(MBQ &a,fun x)

@@ -1,6 +1,6 @@
 #include "OBIM.h"
 #define INF 0x3f3f3f3f
-#define N 100010
+#define N 5100010
 vector<pair<int,int>>G[N];
 atomic<int>dis[N];
 void solve(OBIM &a,fun x,int tid)
@@ -28,7 +28,7 @@ int main()
     read();read();read();read();
     static OBIM a;
     int n=read(),m=read();
-    for(int i=1;i<=n;i++)dis[i].store(INF);
+    for(int i=0;i<=n;i++)dis[i].store(INF);
     for(int i=1;i<=m;i++)
     {
         int u=read(),v=read(),w=read();
@@ -41,6 +41,7 @@ int main()
     vector<thread>workers;
     for(int i=0;i<TNUM;i++)
     {
+        bindCPU(i);
         workers.emplace_back([&,i]()
         {
             while(1)
