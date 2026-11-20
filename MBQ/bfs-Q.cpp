@@ -1,7 +1,9 @@
+
 #include "MBQ.h"
 #include "LJ.h"
 #include<sys/resource.h>
 #define N 5000100
+#define RUN 100
 atomic<int>dis[N];
 double cputime()
 {
@@ -16,8 +18,11 @@ int main()
     RANGE=0;
     SIZE=64;
     BATCH=16;
-    static MBQ a;
     if(!loadLJ("data/LJ.txt",0))return 1;
+    double totalcpu=0,totalwall=0;
+    for(int k=1;k<=RUN;k++)
+    {
+    MBQ a;
     for(int i=0;i<n;i++)dis[i].store(INF);
     dis[0].store(0);
     fun s;
@@ -62,7 +67,6 @@ int main()
             }
         });
     }
-    this_thread::sleep_for(chrono::seconds(10));
     while(ready.load()!=TNUM)this_thread::yield();
     double cpu1=cputime();
     auto st=chrono::steady_clock::now();
@@ -70,6 +74,11 @@ int main()
     for(auto &t:workers)t.join();
     auto ed=chrono::steady_clock::now();
     double cpu2=cputime();
+    double tm=chrono::duration<double>(ed-st).count();
+    totalcpu+=cpu2-cpu1;
+    totalwall+=tm;
+    printf("Run %d: %.3f s\n",k,tm);
+    }
     int mmax=0;
     long long cnt=0,sum=0;
     for(int i=0;i<n;i++)
@@ -83,10 +92,11 @@ int main()
     printf("%d\n",mmax);
     printf("Reachable = %lld\n",cnt);
     printf("Distance Sum = %lld\n",sum);
-    double tm=chrono::duration<double>(ed-st).count();
-    printf("CPU Time = %.3f s\n",cpu2-cpu1);
-    printf("Wall Time = %.3f s\n",tm);
-    printf("CPU Utilization = %.2f%%\n",(cpu2-cpu1)/tm*100);
-    printf("Core Utilization = %.2f%%\n",(cpu2-cpu1)/tm/TNUM*100);
+    printf("Total CPU Time = %.3f s\n",totalcpu);
+    printf("Total Wall Time = %.3f s\n",totalwall);
+    printf("Average CPU Time = %.3f s\n",totalcpu/RUN);
+    printf("Average Wall Time = %.3f s\n",totalwall/RUN);
+    printf("CPU Utilization = %.2f%%\n",totalcpu/totalwall*100);
+    printf("Core Utilization = %.2f%%\n",totalcpu/totalwall/TNUM*100);
     return 0;
 }
