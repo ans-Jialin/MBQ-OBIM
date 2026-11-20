@@ -25,14 +25,16 @@ int main()
     s.p=0;
     a.push(s);
     a.threadpush();
-    double cpu1=cputime();
-    auto st=chrono::steady_clock::now();
+    atomic<int>ready{0};
+    atomic<bool>go{false};
     vector<thread>workers;
     for(int i=0;i<TNUM;i++)
     {
         workers.emplace_back([&]()
         {
             a.initTID();
+            ready.fetch_add(1);
+            while(!go.load())this_thread::yield();
             while(1)
             {
                 bucket res=a.pop();
@@ -60,6 +62,10 @@ int main()
             }
         });
     }
+    while(ready.load()!=TNUM)this_thread::yield();
+    double cpu1=cputime();
+    auto st=chrono::steady_clock::now();
+    go.store(true);
     for(auto &t:workers)t.join();
     auto ed=chrono::steady_clock::now();
     double cpu2=cputime();
