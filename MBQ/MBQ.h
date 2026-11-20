@@ -69,18 +69,17 @@ struct bucket
     {
         if(cnt==BNUM)
         {
-            b.resize(BNUM*2);
-            head=0,tail=BNUM;
-            b[tail++]=x;
+            vector<fun>tmp(BNUM*2);
+            for(int i=0;i<cnt;i++)
+                tmp[i]=b[(head+i)%BNUM];
+            b.swap(tmp);
             BNUM*=2;
-            cnt++;
+            head=0;
+            tail=cnt;
         }
-        else
-        {
-            b[tail++]=x;
-            if(tail>=BNUM)tail%=BNUM;
-            cnt++;
-        }
+        b[tail++]=x;
+        if(tail>=BNUM)tail=0;
+        cnt++;
     }
     bucket pop(int k)
     {

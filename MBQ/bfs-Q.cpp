@@ -64,12 +64,18 @@ int main()
     auto ed=chrono::steady_clock::now();
     double cpu2=cputime();
     int mmax=0;
+    long long cnt=0,sum=0;
     for(int i=0;i<n;i++)
     {
-        if(dis[i]==INF)continue;
-        mmax=max(mmax,dis[i].load());
+        int d=dis[i].load();
+        if(d==INF)continue;
+        mmax=max(mmax,d);
+        cnt++;
+        sum+=d;
     }
     printf("%d\n",mmax);
+    printf("Reachable = %lld\n",cnt);
+    printf("Distance Sum = %lld\n",sum);
     double tm=chrono::duration<double>(ed-st).count();
     printf("CPU Time = %.3f s\n",cpu2-cpu1);
     printf("Wall Time = %.3f s\n",tm);
