@@ -62,6 +62,7 @@ int main()
             }
         });
     }
+    this_thread::sleep_for(chrono::seconds(10));
     while(ready.load()!=TNUM)this_thread::yield();
     double cpu1=cputime();
     auto st=chrono::steady_clock::now();
