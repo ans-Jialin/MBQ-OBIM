@@ -17,7 +17,7 @@ int main()
     SIZE=64;
     BATCH=16;
     static MBQ a;
-    if(!loadLJ("/Users/jialin/datasets/LJ.txt",0))return 1;
+    if(!loadLJ("data/LJ.txt",0))return 1;
     for(int i=0;i<n;i++)dis[i].store(INF);
     dis[0].store(0);
     fun s;
